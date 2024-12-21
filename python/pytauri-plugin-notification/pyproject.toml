@@ -1,9 +1,23 @@
 [project]
 name = "pytauri-plugin-notification"
-version = "0.1.0"
+version = "0.1.0-beta.0"
 readme = "README.md"
+license = "Apache-2.0"
 requires-python = ">=3.9"
-dependencies = ["typing-extensions >= 4"]
+authors = [
+    { name = "Sean Wang", email = "126865849+WSH032@users.noreply.github.com" },
+]
+description = "tauri-plugin-notification binding for PyTauri."
+
+# <https://iscinumpy.dev/post/bound-version-constraints/>
+dependencies = [
+    "typing-extensions >= 4",
+    # workspaces, must use `==`
+    "pytauri == 0.1.*",
+]
+
+[tool.uv.sources]
+pytauri = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

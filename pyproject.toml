@@ -38,7 +38,8 @@ test = [
 ]
 tools = ["pre-commit == 4.0.1"]
 # NOTE: when adding workspace members,
-# remember to update `preload_modules` in `mkdocs.yml`.
+# remember to update `preload_modules` in `mkdocs.yml`,
+# and `[tool.coverage.run.source]` in `pyproject.toml`.
 workspaces = [
     "codelldb",
     "pyfuture",

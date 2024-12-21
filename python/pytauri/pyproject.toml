@@ -1,22 +1,29 @@
 [project]
 name = "pytauri"
-version = "0.1.0"
+version = "0.1.0-beta.0"
 readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Sean Wang", email = "126865849+WSH032@users.noreply.github.com" },
+]
 requires-python = ">=3.9"
+description = "Tauri binding for Python through Pyo3."
+
+# <https://iscinumpy.dev/post/bound-version-constraints/>
 dependencies = [
-    "pydantic == 2.*",
-    "anyio == 4.*",
+    "pydantic >= 2",
+    "anyio >= 4",
     "typing-extensions >= 4",
     # See: <https://pypi.org/project/backports.entry-points-selectable/>
     # and: <https://docs.python.org/3/library/importlib.metadata.html#entry-points>
     # Deprecated: once we no longer support versions Python 3.9, we can remove this dependency.
-    "importlib-metadata >= 3.6",
-    # workspaces
-    "pyo3-utils",
+    "importlib-metadata >= 8",
+    # workspaces, must use `==`
+    "pyo3-utils == 0.1.*",
 ]
 
 [tool.uv.sources]
-pyo3-utils= { workspace = true }
+pyo3-utils = { workspace = true }
 
 [build-system]
 requires = ["hatchling"]

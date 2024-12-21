@@ -1,7 +1,12 @@
 [project]
 name = "codelldb"
-version = "0.1.0"
+version = "0.1.0-beta.0"
 readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Sean Wang", email = "126865849+WSH032@users.noreply.github.com" },
+]
+description = "Launch CodeLLDB in debugpy to debug rust code."
 requires-python = ">=3.9"
 
 # NOTE: DO NOT use third-party libraries in this file,

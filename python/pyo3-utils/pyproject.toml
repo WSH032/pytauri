@@ -1,9 +1,15 @@
 [project]
 name = "pyo3-utils"
-version = "0.1.0"
+version = "0.1.0-beta.0"
 readme = "README.md"
+license = "Apache-2.0"
+authors = [
+    { name = "Sean Wang", email = "126865849+WSH032@users.noreply.github.com" },
+]
+description = "Python integration for the pyo3-utils crate."
 requires-python = ">=3.9"
 
+# <https://iscinumpy.dev/post/bound-version-constraints/>
 dependencies = ["typing-extensions >= 4"]
 
 [build-system]

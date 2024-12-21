@@ -1,0 +1,89 @@
+# refer to: https://packaging.python.org/en/latest/guides/publishing-package-distribution-releases-using-github-actions-ci-cd-workflows/
+
+# WARNING: Do not change the name of this file, keep `publish-py.yml`.
+# "trusted publishing" will check the name of the workflow file.
+
+name: Publish Python 🐍 distribution 📦 to PyPI
+
+on:
+  push:
+    tags:
+      # e.g., py/pyo3-utils/v0.1.0
+      - py/*/v*
+
+defaults:
+  run:
+    shell: bash
+
+# NOTE: It's better not to use cache for release workflow.
+jobs:
+  build-dist:
+    name: Build distribution 📦
+    runs-on: ubuntu-latest
+    outputs:
+      package: ${{ steps.dry-run.outputs.package }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: setup-envs-ver
+        id: setup-envs-ver
+        uses: ./.github/actions/setup-envs-ver
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          # see: <https://docs.astral.sh/uv/guides/integration/github/>
+          version: ${{ steps.setup-envs-ver.outputs.uv }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version-file: "pyproject.toml"
+
+      - name: Build a binary wheel and a source tarball (e.g., dry-run)
+        id: dry-run
+        run: python ./release.py ${{ github.ref }}
+
+      - name: Store the distribution packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+          if-no-files-found: error
+
+  publish-to-pypi:
+    needs:
+      - build-dist
+    name: Publish Python 🐍 distribution 📦 to PyPI
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/project/${{ needs.build-dist.outputs.package }}
+    permissions:
+      id-token: write # IMPORTANT: mandatory for trusted publishing
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Publish distribution 📦 to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  github-release:
+    needs:
+      - publish-to-pypi
+    name: Create GitHub release 🏷️
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # IMPORTANT: mandatory for creating release
+    steps:
+      - name: Download all the dists
+        uses: actions/download-artifact@v4
+        with:
+          name: python-package-distributions
+          path: dist/
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          draft: true
+          body: ${{ github.event.head_commit.message }}
+          artifacts: dist/*.whl,dist/*.tar.gz
