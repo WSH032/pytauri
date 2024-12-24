@@ -1,9 +1,0 @@
-{
-    "bundle": {
-        "active": true,
-        "targets": "all",
-        "resources": {
-            "pyembed/python": "./"
-        }
-    }
-}

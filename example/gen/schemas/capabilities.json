@@ -1,1 +1,0 @@
-{"default":{"identifier":"default","description":"Capability for the main window","local":true,"windows":["main"],"permissions":["core:default","shell:allow-open","pytauri:default","notification:default"]}}

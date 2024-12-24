@@ -7,9 +7,9 @@ members = [
     "pyfuture",
     "pyo3-utils",
     "pytauri",
-    "pytauri-demo",
     "pytauri-plugin-notification",
     "pytauri-workspace",
+    "tauri-app",
 ]
 
 [[package]]
@@ -1009,29 +1009,6 @@ requires-dist = [
 ]
 
 [[package]]
-name = "pytauri-demo"
-version = "0.1.0"
-source = { editable = "example" }
-dependencies = [
-    { name = "anyio" },
-    { name = "codelldb" },
-    { name = "pydantic" },
-    { name = "pytauri" },
-    { name = "pytauri-plugin-notification" },
-    { name = "typing-extensions" },
-]
-
-[package.metadata]
-requires-dist = [
-    { name = "anyio", specifier = "==4.*" },
-    { name = "codelldb", editable = "python/codelldb" },
-    { name = "pydantic", specifier = "==2.*" },
-    { name = "pytauri", editable = "python/pytauri" },
-    { name = "pytauri-plugin-notification", editable = "python/pytauri-plugin-notification" },
-    { name = "typing-extensions", specifier = ">=4" },
-]
-
-[[package]]
 name = "pytauri-plugin-notification"
 version = "0.1.0b0"
 source = { editable = "python/pytauri-plugin-notification" }
@@ -1068,7 +1045,6 @@ dev = [
     { name = "pyfuture" },
     { name = "pyo3-utils" },
     { name = "pytauri" },
-    { name = "pytauri-demo" },
     { name = "pytauri-plugin-notification" },
     { name = "pytest" },
     { name = "pytest-cov" },
@@ -1077,6 +1053,7 @@ dev = [
     { name = "setuptools" },
     { name = "setuptools-rust" },
     { name = "setuptools-scm" },
+    { name = "tauri-app" },
     { name = "trio" },
     { name = "typos" },
 ]
@@ -1093,10 +1070,10 @@ docs = [
     { name = "mkdocstrings", extra = ["python"] },
 ]
 example = [
-    { name = "pytauri-demo" },
     { name = "setuptools" },
     { name = "setuptools-rust" },
     { name = "setuptools-scm" },
+    { name = "tauri-app" },
 ]
 lint = [
     { name = "ruff" },
@@ -1138,7 +1115,6 @@ dev = [
     { name = "pyfuture", editable = "python/pyfuture" },
     { name = "pyo3-utils", editable = "python/pyo3-utils" },
     { name = "pytauri", editable = "python/pytauri" },
-    { name = "pytauri-demo", editable = "example" },
     { name = "pytauri-plugin-notification", editable = "python/pytauri-plugin-notification" },
     { name = "pytest", specifier = "==8.3.*" },
     { name = "pytest-cov", specifier = "==6.0.*" },
@@ -1147,6 +1123,7 @@ dev = [
     { name = "setuptools", specifier = ">=64" },
     { name = "setuptools-rust", specifier = "==1.*" },
     { name = "setuptools-scm", specifier = ">=8" },
+    { name = "tauri-app", editable = "example/tauri-app/src-tauri" },
     { name = "trio", specifier = "==0.27.0" },
     { name = "typos", specifier = "==1.28.2" },
 ]
@@ -1163,10 +1140,10 @@ docs = [
     { name = "mkdocstrings", extras = ["python"], specifier = "==0.27.*" },
 ]
 example = [
-    { name = "pytauri-demo", editable = "example" },
     { name = "setuptools", specifier = ">=64" },
     { name = "setuptools-rust", specifier = "==1.*" },
     { name = "setuptools-scm", specifier = ">=8" },
+    { name = "tauri-app", editable = "example/tauri-app/src-tauri" },
 ]
 lint = [
     { name = "ruff", specifier = "==0.8.3" },
@@ -1521,6 +1498,17 @@ sdist = { url = "https://files.pythonhosted.org/packages/e8/c4/ba2f8066cceb6f233
 wheels = [
     { url = "https://files.pythonhosted.org/packages/32/46/9cb0e58b2deb7f82b84065f37f3bffeb12413f947f9388e4cac22c4621ce/sortedcontainers-2.4.0-py2.py3-none-any.whl", hash = "sha256:a163dcaede0f1c021485e957a39245190e74249897e2ae4b2aa38595db237ee0", size = 29575 },
 ]
+
+[[package]]
+name = "tauri-app"
+version = "0.1.0"
+source = { editable = "example/tauri-app/src-tauri" }
+dependencies = [
+    { name = "pytauri" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "pytauri", editable = "python/pytauri" }]
 
 [[package]]
 name = "tomli"

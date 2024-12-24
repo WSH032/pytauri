@@ -1,6 +1,0 @@
-# See syntax: <https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html>
-
-# We don't include the source files for frontend,
-# instead only include the distribution.
-prune front
-graft front/dist

@@ -9,7 +9,7 @@
             ],
             "console": "integratedTerminal",
             "request": "launch",
-            "module": "pytauri_demo", // your module name
+            "module": "tauri_app", // your module name
             "args": [], // whatever you want
             "env": {
                 "VSCODE_RUST_DEBUG": "${input:rustDebug}",

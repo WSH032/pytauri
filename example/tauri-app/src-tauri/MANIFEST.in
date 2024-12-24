@@ -1,0 +1,2 @@
+# See syntax: <https://setuptools.pypa.io/en/latest/userguide/miscellaneous.html>
+graft frontend/

@@ -1,6 +1,0 @@
-# See: <https://tauri.app/develop/#reacting-to-source-code-changes>
-#
-# When using `cargo tauri dev`, we only monitor changes in `./src` for Rust code.
-# Otherwise, changes of some compile caches in `./front` and `./python` will recursively trigger recompilation.
-/*
-!/src

@@ -51,12 +51,12 @@ example = [
     "setuptools >= 64",
     "setuptools-scm >= 8",
     "setuptools-rust == 1.*",
-    "pytauri-demo",
+    "tauri-app",
 ]
 
 
 [tool.uv.sources]
-pytauri-demo = { workspace = true }
+tauri-app = { workspace = true }
 codelldb = { workspace = true }
 pyfuture = { workspace = true }
 pyo3-utils = { workspace = true }
@@ -65,7 +65,7 @@ pytauri-plugin-notification = { workspace = true }
 
 # https://docs.astral.sh/uv/concepts/workspaces/
 [tool.uv.workspace]
-members = ["python/*", "example"]
+members = ["python/*", "example/tauri-app/src-tauri"]
 
 
 [tool.pyright]
@@ -142,7 +142,7 @@ convention = "google"
 [tool.coverage.run]
 branch = true
 source = [
-    "pytauri_demo",
+    "tauri_app",
     "codelldb",
     "pyfuture",
     "pyo3_utils",
