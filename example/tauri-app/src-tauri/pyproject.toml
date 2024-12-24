@@ -3,7 +3,7 @@ name = "tauri-app"
 version = "0.1.0"
 description = "Add your description here"
 requires-python = ">=3.9"
-dependencies = ["pytauri == 0.1.*"]
+dependencies = ["pytauri == 0.1.*", "pydantic == 2.*", "anyio == 4.*"]
 
 [project.entry-points.pytauri]
 # - "tauri_app" -> `python/tauri_app/`

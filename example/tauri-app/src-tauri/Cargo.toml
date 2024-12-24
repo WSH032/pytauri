@@ -26,3 +26,4 @@ serde_json = { workspace = true }
 
 pyo3 = { workspace = true }
 pytauri = { workspace = true, features = ["standalone"] }
+tauri-plugin-pytauri = { workspace = true }

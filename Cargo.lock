@@ -3782,6 +3782,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "tauri-plugin-opener",
+ "tauri-plugin-pytauri",
 ]
 
 [[package]]

@@ -68,6 +68,9 @@ importers:
       '@tauri-apps/plugin-opener':
         specifier: ^2
         version: 2.2.2
+      tauri-plugin-pytauri-api:
+        specifier: workspace:*
+        version: link:../../crates/tauri-plugin-pytauri/guest-js
     devDependencies:
       '@tauri-apps/cli':
         specifier: ^2
