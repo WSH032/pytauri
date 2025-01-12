@@ -11,15 +11,19 @@
 //!
 //! [pyembed]: https://crates.io/crates/pyembed
 
-use std::fs;
-use std::io;
-use std::path::{absolute, Path, PathBuf};
+use std::{
+    env::{args_os, current_exe},
+    ffi::OsString,
+    fs, io,
+    path::{absolute, Path, PathBuf},
+};
 
-use pyo3::ffi as pyffi;
-use pyo3::ffi::c_str;
-use pyo3::prelude::*;
-use pyo3::prepare_freethreaded_python;
-use pyo3::types::PyModule;
+use pyo3::{
+    ffi::{self as pyffi, c_str},
+    prelude::*,
+    prepare_freethreaded_python,
+    types::PyModule,
+};
 
 use crate::pyembed::{utils, NewInterpreterError, NewInterpreterResult};
 
@@ -98,6 +102,14 @@ impl PyConfig {
         )
     }
 
+    pub fn set_argv(&mut self, args: &[OsString]) -> NewInterpreterResult<()> {
+        utils::set_argv(&mut self.0, args)
+    }
+
+    pub fn set_parse_argv(&mut self, parse_argv: bool) {
+        self.0.parse_argv = if parse_argv { 1 } else { 0 };
+    }
+
     /// After calling this method, the Python interpreter has already been initialized,
     /// so [pyo3::prepare_freethreaded_python] is a no-op.
     /// But you still need to call it to let pyo3 know that the interpreter has been initialized.
@@ -154,6 +166,46 @@ pub fn get_python_executable_from_venv(venv_path: impl Into<PathBuf>) -> PathBuf
     absolute(&venv_path).expect("failed to get absolute path")
 }
 
+/// Whether the Python interpreter is in "multiprocessing worker" mode.
+///
+/// The `multiprocessing` module can work by spawning new processes
+/// with arguments `--multiprocessing-fork [key=value] ...`. This function
+/// detects if the current Python interpreter is configured for said execution.
+///
+/// Useful if you want to use cil arg parsing lib like `clap` in your standalone app.
+///
+/// # NOTE
+///
+/// This function only work on Windows with `spawn` multiprocessing start method.
+/// On Unix, you should use `fork` start method.
+// ---
+//
+// ref: <https://github.com/indygreg/PyOxidizer/blob/ae36f8672d905a911f1b8243308fe45c5fe981de/pyembed/src/interpreter.rs#L582-L591>
+#[cfg(any(windows, doc))]
+pub fn is_forking() -> bool {
+    let mut argv = args_os();
+    if let Some(arg) = argv.nth(1) {
+        arg == "--multiprocessing-fork"
+    } else {
+        false
+    }
+}
+
+fn freeze(py: Python<'_>) -> PyResult<()> {
+    let current_exe = current_exe()?;
+
+    let _freeze = PyModule::from_code(
+        py,
+        c_str!(include_str!("_freeze.py")),
+        c"_freeze.py",
+        c"_freeze",
+    )?;
+
+    _freeze.getattr("freeze")?.call1((current_exe,))?;
+
+    Ok(())
+}
+
 /// Prepare a Python interpreter with the specified Python executable.
 ///
 /// See:
@@ -192,9 +244,26 @@ pub fn prepare_freethreaded_python_with_executable(
     let mut config = PyConfig::new(PyConfigProfile::Python);
     config.set_program_name(executable)?;
     config.set_executable(executable)?;
+    config.set_argv(&args_os().collect::<Vec<_>>())?;
+    // `parse_argv=false` is necessary, because python only accepts following argv pattern:
+    //
+    // ```shell
+    // # <https://docs.python.org/3/using/cmdline.html#using-on-cmdline>
+    // python [-bBdEhiIOPqRsSuvVWx?] [-c command | -m module-name | script | - ] [args]
+    // ```
+    //
+    // This will prevent us from using libraries like `clap` to parse command line arguments
+    config.set_parse_argv(false);
     config.init()?;
 
     prepare_freethreaded_python();
+
+    Python::with_gil(|py| {
+        freeze(py).map_err(|e| {
+            NewInterpreterError::new_from_pyerr(py, e, "failed to freeze the Python interpreter")
+        })
+    })?;
+
     Ok(())
 }
 
@@ -228,8 +297,8 @@ pub fn append_ext_mod(ext_mod: Bound<PyModule>) -> PyResult<()> {
     let _append_ext_mod = PyModule::from_code(
         py,
         c_str!(include_str!("_append_ext_mod.py")),
-        c_str!("_append_ext_mod.py"),
-        c_str!("_append_ext_mod"),
+        c"_append_ext_mod.py",
+        c"_append_ext_mod",
     )?;
 
     _append_ext_mod

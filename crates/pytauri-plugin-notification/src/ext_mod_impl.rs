@@ -1,14 +1,10 @@
-use std::ops::Deref;
-
 use std::error::Error;
 use std::fmt::{Debug, Display};
 
 use pyo3::prelude::*;
-use pyo3::PyRef;
-use pyo3_utils::py_wrapper::{MappableDeref, PyWrapper, PyWrapperSemverExt as _, PyWrapperT2};
-use pytauri_core::ext_mod::{App, AppHandle};
-use pytauri_core::tauri_runtime::Runtime;
-use tauri_plugin_notification as plugin;
+use pyo3_utils::py_wrapper::{PyWrapper, PyWrapperSemverExt as _, PyWrapperT2};
+use pytauri_core::{ext_mod::ImplManager, tauri_runtime::Runtime};
+use tauri_plugin_notification::{self as plugin, NotificationExt as _};
 
 #[derive(Debug)]
 struct PluginError(plugin::Error);
@@ -93,57 +89,11 @@ impl NotificationBuilder {
     }
 }
 
-#[derive(FromPyObject, IntoPyObject, IntoPyObjectRef)]
-#[non_exhaustive]
-// TODO: more types
-pub enum ImplNotificationExt {
-    App(Py<App>),
-    AppHandle(Py<AppHandle>),
-}
-
-impl ImplNotificationExt {
-    #[inline]
-    fn borrow<'py>(&'py self, py: Python<'py>) -> ImplNotificationExtRef<'py> {
-        match self {
-            Self::App(v) => ImplNotificationExtRef::App(v.borrow(py)),
-            Self::AppHandle(v) => ImplNotificationExtRef::AppHandle(v.borrow(py)),
-        }
-    }
-}
-
-/// We need this newtype instead of directly implementing on [ImplNotificationExt],
-/// because [App] does not implement the [Py::get] method
-#[non_exhaustive]
-enum ImplNotificationExtRef<'py> {
-    App(PyRef<'py, App>),
-    AppHandle(PyRef<'py, AppHandle>),
-}
-
-impl ImplNotificationExtRef<'_> {
-    // NOTE: `#[inline]` is necessary for optimization to dyn object
-    #[inline]
-    fn defer_dyn(
-        &self,
-    ) -> PyResult<Box<dyn Deref<Target = dyn plugin::NotificationExt<Runtime>> + '_>> {
-        macro_rules! defer_dyn_impl {
-            ($wrapper:expr) => {{
-                let guard = $wrapper.inner_ref_semver()??;
-                let guard =
-                    MappableDeref::map(guard, |v| v as &dyn plugin::NotificationExt<Runtime>);
-                Ok(Box::new(guard))
-            }};
-        }
-
-        match self {
-            Self::App(v) => defer_dyn_impl!(v.0),
-            Self::AppHandle(v) => defer_dyn_impl!(v.0),
-        }
-    }
-}
-
 #[pyclass(frozen)]
 #[non_exhaustive]
 pub struct NotificationExt;
+
+pub type ImplNotificationExt = ImplManager;
 
 #[pymethods]
 impl NotificationExt {
@@ -152,7 +102,18 @@ impl NotificationExt {
 
     #[staticmethod]
     fn builder(slf: ImplNotificationExt, py: Python<'_>) -> PyResult<NotificationBuilder> {
-        let builder = slf.borrow(py).defer_dyn()?.notification().builder();
-        Ok(NotificationBuilder::new(builder))
+        macro_rules! builder_impl {
+            ($wrapper:expr) => {{
+                let py_ref = $wrapper.borrow(py);
+                let guard = py_ref.0.inner_ref_semver()??;
+                let builder = guard.notification().builder();
+                Ok(NotificationBuilder::new(builder))
+            }};
+        }
+        match slf {
+            ImplNotificationExt::App(v) => builder_impl!(v),
+            ImplNotificationExt::AppHandle(v) => builder_impl!(v),
+            _ => unimplemented!("please create an feature request to pytauri"),
+        }
     }
 }

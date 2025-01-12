@@ -1,3 +1,4 @@
+from os import getenv
 from types import ModuleType
 from typing import TYPE_CHECKING
 
@@ -6,14 +7,26 @@ from typing import TYPE_CHECKING
 # Deprecated: once we no longer support versions Python 3.9, we can remove this dependency.
 from importlib_metadata import (
     EntryPoint,
+    distribution,
     entry_points,  # pyright: ignore[reportUnknownVariableType]
 )
 
 __all__ = ["EXT_MOD", "pytauri_mod"]
 
+_SPECIFIC_DIST = getenv("_PYTAURI_DIST")
+"""specify the package distribution name of a pytauri app to load the extension module."""
+
 
 def _load_ext_mod() -> ModuleType:
-    eps: tuple[EntryPoint, ...] = tuple(entry_points(group="pytauri", name="ext_mod"))
+    group = "pytauri"
+    name = "ext_mod"
+    eps = (
+        entry_points(group=group, name=name)
+        if not _SPECIFIC_DIST
+        else distribution(_SPECIFIC_DIST).entry_points.select(group=group, name=name)  # pyright: ignore[reportUnknownMemberType]
+    )
+    eps: tuple[EntryPoint, ...] = tuple(eps)
+
     if len(eps) == 0:
         raise RuntimeError("No `pytauri` entry point is found")
     elif len(eps) > 1:

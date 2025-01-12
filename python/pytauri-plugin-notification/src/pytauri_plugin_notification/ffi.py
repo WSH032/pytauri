@@ -6,9 +6,9 @@
 """
 
 from types import ModuleType
-from typing import TYPE_CHECKING, Optional, Union, final
+from typing import TYPE_CHECKING, Optional, final
 
-from pytauri import EXT_MOD, App, AppHandle
+from pytauri import EXT_MOD, ImplManager
 from typing_extensions import Self, TypeAlias
 
 __all__ = [
@@ -73,5 +73,5 @@ else:
     NotificationBuilder = _notification_mod.NotificationBuilder
     NotificationExt = _notification_mod.NotificationExt
 
-ImplNotificationExt: TypeAlias = Union[App, AppHandle]
+ImplNotificationExt: TypeAlias = ImplManager
 """The implementors of `NotificationExt`."""

@@ -20,6 +20,8 @@ __all__ = [
     "Builder",
     "BuilderArgs",
     "Context",
+    "ImplManager",
+    "Manager",
     "RunEvent",
     "RunEventEnum",
     "RunEventEnumType",
@@ -40,6 +42,8 @@ _AppRunCallbackType = Callable[["AppHandle", "RunEvent"], None]
 
 if TYPE_CHECKING:
     from pyo3_utils import PyMatchRefMixin
+
+    from pytauri.ffi.webview import WebviewWindow
 
     @final
     class App:
@@ -86,6 +90,10 @@ if TYPE_CHECKING:
 
             **You should always exit the tauri app immediately after this function returns and not use any tauri-related APIs.**
             """
+
+        def handle(self, /) -> "AppHandle":
+            """Get a handle to this app, which can be used to interact with the app from another thread."""
+            ...
 
     @final
     class AppHandle:
@@ -197,6 +205,16 @@ if TYPE_CHECKING:
         """
         ...
 
+    @final
+    class Manager:
+        """[tauri::Manager](https://docs.rs/tauri/latest/tauri/trait.Manager.html)"""
+
+        @staticmethod
+        def get_webview_window(
+            slf: "ImplManager", label: str, /
+        ) -> Optional[WebviewWindow]:
+            """Fetch a single webview window from the manager."""
+
 
 else:
     App = pytauri_mod.App
@@ -208,6 +226,7 @@ else:
     RunEventEnum = pytauri_mod.RunEventEnum
     builder_factory = pytauri_mod.builder_factory
     context_factory = pytauri_mod.context_factory
+    Manager = pytauri_mod.Manager
 
 
 RunEventEnumType: TypeAlias = Union[
@@ -221,3 +240,5 @@ RunEventEnumType: TypeAlias = Union[
     RunEventEnum.MenuEvent,
 ]
 """See [RunEventEnum][pytauri.RunEventEnum] for details."""
+
+ImplManager: TypeAlias = Union[App, AppHandle]

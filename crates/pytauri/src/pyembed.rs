@@ -111,8 +111,13 @@ pub(crate) use error::{NewInterpreterError, NewInterpreterResult};
 // see: <https://github.com/indygreg/PyOxidizer/blob/1ceca8664c71f39e849ce4873e00d821504b32bd/pyembed/src/interpreter_config.rs#L29-L251>
 pub(crate) mod utils {
     use super::*;
+    use std::ffi::OsString;
+
     #[cfg(target_family = "unix")]
-    use std::{ffi::CString, os::unix::ffi::OsStrExt};
+    use std::{
+        ffi::{CString, NulError},
+        os::unix::ffi::OsStrExt,
+    };
 
     #[cfg(target_family = "windows")]
     use std::os::windows::prelude::OsStrExt;
@@ -163,6 +168,71 @@ pub(crate) mod utils {
 
         if unsafe { pyffi::PyStatus_Exception(status) } != 0 {
             Err(NewInterpreterError::new_from_pystatus(&status, context))
+        } else {
+            Ok(())
+        }
+    }
+
+    #[cfg(target_family = "unix")]
+    pub fn set_argv(
+        config: &mut pyffi::PyConfig,
+        args: &[OsString],
+    ) -> Result<(), NewInterpreterError> {
+        let argc = args.len() as isize;
+        let argv = args
+            .iter()
+            .map(|x| CString::new(x.as_bytes()))
+            .collect::<Result<Vec<_>, NulError>>()
+            .map_err(|_| {
+                NewInterpreterError::Simple("unable to construct C string from OsString")
+            })?;
+        let argvp = argv
+            .iter()
+            .map(|x| x.as_ptr() as *mut i8)
+            .collect::<Vec<_>>();
+
+        let status = unsafe {
+            pyffi::PyConfig_SetBytesArgv(config as *mut _, argc, argvp.as_ptr() as *mut _)
+        };
+
+        if unsafe { pyffi::PyStatus_Exception(status) } != 0 {
+            Err(NewInterpreterError::new_from_pystatus(
+                &status,
+                "setting argv",
+            ))
+        } else {
+            Ok(())
+        }
+    }
+
+    #[cfg(target_family = "windows")]
+    pub fn set_argv(
+        config: &mut pyffi::PyConfig,
+        args: &[OsString],
+    ) -> Result<(), NewInterpreterError> {
+        let argc = args.len() as isize;
+        let argv = args
+            .iter()
+            .map(|x| {
+                let mut buffer = x.encode_wide().collect::<Vec<u16>>();
+                buffer.push(0);
+
+                buffer
+            })
+            .collect::<Vec<_>>();
+        let argvp = argv
+            .iter()
+            .map(|x| x.as_ptr() as *mut u16)
+            .collect::<Vec<_>>();
+
+        let status =
+            unsafe { pyffi::PyConfig_SetArgv(config as *mut _, argc, argvp.as_ptr() as *mut _) };
+
+        if unsafe { pyffi::PyStatus_Exception(status) } != 0 {
+            Err(NewInterpreterError::new_from_pystatus(
+                &status,
+                "setting argv",
+            ))
         } else {
             Ok(())
         }

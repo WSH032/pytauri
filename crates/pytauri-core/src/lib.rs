@@ -19,9 +19,11 @@ pub mod ext_mod {
     use super::*;
 
     #[pymodule_export]
-    pub use ext_mod_impl::{App, AppHandle, Context, RunEvent, RunEventEnum};
+    pub use ext_mod_impl::{App, AppHandle, Context, Manager, RunEvent, RunEventEnum};
 
-    pub use ext_mod_impl::{PyAppHandleExt, PyAppHandleStateError, PyAppHandleStateResult};
+    pub use ext_mod_impl::{
+        ImplManager, PyAppHandleExt, PyAppHandleStateError, PyAppHandleStateResult,
+    };
 
     /// see also: [tauri::ipc]
     #[pymodule]
@@ -30,5 +32,14 @@ pub mod ext_mod {
 
         #[pymodule_export]
         pub use ext_mod_impl::ipc::{Invoke, InvokeResolver};
+    }
+
+    /// see also: [tauri::webview]
+    #[pymodule]
+    pub mod webview {
+        use super::*;
+
+        #[pymodule_export]
+        pub use ext_mod_impl::webview::WebviewWindow;
     }
 }

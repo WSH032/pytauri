@@ -2,6 +2,14 @@
 
 """The tauri-app."""
 
+from os import environ
+
+# This is an env var that can only be used internally by pytauri to distinguish
+# between different example extension modules.
+# You don't need and shouldn't set this in your own app.
+# Must be set before importing any pytauri module.
+environ["_PYTAURI_DIST"] = "tauri-app"
+
 import sys
 
 from anyio.from_thread import start_blocking_portal

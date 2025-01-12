@@ -10,7 +10,7 @@ use pytauri::standalone::{
 };
 use tauri::{Builder, Manager as _};
 
-use tauri_app_lib::{ext_mod, tauri_generate_context};
+use nicegui_app_lib::{ext_mod, tauri_generate_context};
 
 fn prepare_python_interpreter() {
     // `cfg(dev)` is set by `tauri-build` in `build.rs`, which means running with `tauri dev`,
@@ -68,8 +68,8 @@ fn execute_python_script(py: Python<'_>) -> PyResult<()> {
 
     // execute your Python script
     py.run(
-        // equivalent to `python -m tauri_app`
-        c"from runpy import run_module; run_module('tauri_app')",
+        // equivalent to `python -m nicegui_app`
+        c"from runpy import run_module; run_module('nicegui_app')",
         None,
         None,
     )
@@ -88,7 +88,7 @@ fn main() -> Result<(), PyErr> {
             *PyDict::new(py),
             r#"
             from os import environ
-            environ["_PYTAURI_DIST"] = "tauri-app"
+            environ["_PYTAURI_DIST"] = "nicegui-app"
             "#
         );
 

@@ -1,0 +1,38 @@
+[package]
+name = "nicegui-app"
+version = "0.1.0"
+description = "A NiceGui App built with Tauri"
+authors = ["you"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+# The `_lib` suffix may seem redundant but it is necessary
+# to make the lib name unique and wouldn't conflict with the bin name.
+# This seems to be only an issue on Windows, see https://github.com/rust-lang/cargo/issues/8519
+name = "nicegui_app_lib"
+# `cdylib` is required for building python extension modules files
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+# the same as the package name
+name = "nicegui-app"
+path = "src/main.rs"
+required-features = ["pytauri/standalone"]
+
+
+[build-dependencies]
+tauri-build = { workspace = true, features = [] }
+
+[dependencies]
+tauri = { workspace = true, features = [] }
+tauri-plugin-opener = "2"
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
+
+pyo3 = { workspace = true }
+pytauri = { workspace = true }
+tauri-plugin-pytauri = { workspace = true }
+tauri-plugin-notification = { workspace = true }
+pytauri-plugin-notification = { workspace = true }

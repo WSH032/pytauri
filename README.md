@@ -94,6 +94,8 @@ Source Code: <https://github.com/WSH032/pytauri/>
         }
         ```
 
+- Can be integrated with [nicegui]/[gradio]/[FastAPI] to achieve a full-stack Python development experience (i.g., without `Node.js`). See [examples/nicegui-app](https://github.com/WSH032/pytauri/tree/main/examples/nicegui-app).
+
 ## Release
 
 | name | pypi | crates.io | npmjs |
@@ -142,10 +144,6 @@ I hope `PyTauri` can become an alternative to [pywebview] and [Pystray], leverag
 Through [Pyo3], I hope Rust developers can better utilize the Python ecosystem (e.g., building AI GUI applications with [PyTorch]).
 
 Although Rust's lifetime and ownership system makes Rust code safer, Python's garbage collection (GC) will make life easier. 😆
-
-### The Future
-
-In the future, I hope PyTauri can integrate with [nicegui] and [gradio], bringing you a Python full-stack (i.g., without `Node.js`) development experience.
 
 [pywebview]: https://github.com/r0x0r/pywebview
 [Pystray]: https://github.com/moses-palmer/pystray
