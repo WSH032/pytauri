@@ -1,6 +1,6 @@
-use pyo3::{prelude::*, types::PyString};
+use pyo3::{exceptions::PyRuntimeError, prelude::*, types::PyString};
 use pyo3_utils::py_wrapper::{PyWrapper, PyWrapperT0};
-use tauri::webview;
+use tauri::{webview, Url};
 
 use crate::tauri_runtime::Runtime;
 use crate::utils::TauriError;
@@ -212,12 +212,10 @@ impl WebviewWindow {
         Ok(PyString::new(py, url.as_ref()))
     }
 
-    // // TODO, FIXME: Why `navigate` need `mut self`? We should ask tauri developers.
-    // // see: <https://github.com/tauri-apps/tauri/issues/12430>
-    // fn navigate(&self, url: &str) -> PyResult<()> {
-    //     let url = Url::parse(url).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
-    //     delegate_inner!(mut self, navigate, url)
-    // }
+    fn navigate(&self, url: &str) -> PyResult<()> {
+        let url = Url::parse(url).map_err(|e| PyRuntimeError::new_err(e.to_string()))?;
+        delegate_inner!(self, navigate, url)
+    }
 
     fn eval(&self, js: &str) -> PyResult<()> {
         delegate_inner!(self, eval, js)
