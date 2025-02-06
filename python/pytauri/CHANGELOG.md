@@ -32,6 +32,7 @@
 
 ### Added
 
+- [#61](https://github.com/WSH032/pytauri/pull/61) - feat: add `Emitter`, `EventTarget`, `EventTargetType`, `ImplEmitter` for [Event System](https://tauri.app/develop/calling-frontend/#event-system).
 - [#50](https://github.com/WSH032/pytauri/pull/50) - feat: add `ipc::Channel`, `ipc::JavaScriptChannelId`, `webview::Webview`, `webview::WebviewWindow::as_ref::<webview>` for [channels ipc](https://tauri.app/develop/calling-frontend/#channels).
 - [#46](https://github.com/WSH032/pytauri/pull/46) - feat: add `webview::WebviewWindow`, `Manager`, `ImplManager`, `App::handle`.
 - [#48](https://github.com/WSH032/pytauri/pull/48) - feat: accessing the `WebviewWindow` in `Commands`.

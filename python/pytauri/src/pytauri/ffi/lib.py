@@ -21,8 +21,12 @@ __all__ = [
     "Builder",
     "BuilderArgs",
     "Context",
+    "Emitter",
     "Event",
     "EventId",
+    "EventTarget",
+    "EventTargetType",
+    "ImplEmitter",
     "ImplListener",
     "ImplManager",
     "Listener",
@@ -44,6 +48,8 @@ class _InvokeHandlerProto(Protocol):
 _AppRunCallbackType = Callable[["AppHandle", "RunEventType"], None]
 
 _EventHandlerType = Callable[["Event"], None]
+
+_EmitterFilterType = Callable[["EventTargetType"], bool]
 
 
 if TYPE_CHECKING:
@@ -310,6 +316,97 @@ if TYPE_CHECKING:
             """
             ...
 
+    @final
+    class EventTarget:
+        """[tauri::EventTarget](https://docs.rs/tauri/latest/tauri/enum.EventTarget.html)"""
+
+        @final
+        class Any:
+            """Any and all event targets."""
+
+            def __new__(cls, /) -> Self: ...  # noqa: D102
+
+        @final
+        class AnyLabel:
+            """Any `Window`, `Webview` or `WebviewWindow` that have this label."""
+
+            label: str
+            """Target label."""
+
+            def __new__(cls, label: str, /) -> Self: ...  # noqa: D102
+
+        @final
+        class App:
+            """App and AppHandle targets."""
+
+            def __new__(cls, /) -> Self: ...  # noqa: D102
+
+        @final
+        class Window:
+            """`Window` target."""
+
+            label: str
+            """window label."""
+
+            def __new__(cls, label: str, /) -> Self: ...  # noqa: D102
+
+        @final
+        class Webview:
+            """Webview target."""
+
+            label: str
+            """webview label."""
+
+            def __new__(cls, label: str, /) -> Self: ...  # noqa: D102
+
+        @final
+        class WebviewWindow:
+            """WebviewWindow target."""
+
+            label: str
+            """webview window label."""
+
+            def __new__(cls, label: str, /) -> Self: ...  # noqa: D102
+
+    class Emitter:
+        """[tauri::Emitter](https://docs.rs/tauri/latest/tauri/trait.Emitter.html)"""
+
+        @staticmethod
+        def emit_str(
+            slf: "ImplEmitter",
+            event: str,
+            payload: str,
+            /,
+        ) -> None:
+            """Similar to [`Emitter::emit`] but the payload is json serialized."""
+            ...
+
+        @staticmethod
+        def emit_str_to(
+            slf: "ImplEmitter",
+            target: "EventTargetType",
+            event: str,
+            payload: str,
+            /,
+        ) -> None:
+            """Similar to [`Emitter::emit_to`] but the payload is json serialized."""
+            ...
+
+        @staticmethod
+        def emit_str_filter(
+            slf: "ImplEmitter",
+            event: str,
+            payload: str,
+            filter: _EmitterFilterType,  # noqa: A002
+            /,
+        ) -> None:
+            """Similar to [`Emitter::emit_filter`] but the payload is json serialized.
+
+            !!! warning
+                `filter` has the same restrictions as [App.run][pytauri.App.run].
+            """
+            ...
+
 
 else:
     App = pytauri_mod.App
@@ -323,6 +420,8 @@ else:
     Manager = pytauri_mod.Manager
     Event = pytauri_mod.Event
     Listener = pytauri_mod.Listener
+    EventTarget = pytauri_mod.EventTarget
+    Emitter = pytauri_mod.Emitter
 
 
 RunEventType: TypeAlias = Union[
@@ -343,3 +442,14 @@ EventId = NewType("EventId", int)
 """[tauri::EventId](https://docs.rs/tauri/latest/tauri/type.EventId.html)"""
 
 ImplListener = ImplManager
+
+ImplEmitter = ImplManager
+
+EventTargetType = Union[
+    EventTarget.Any,
+    EventTarget.AnyLabel,
+    EventTarget.App,
+    EventTarget.Window,
+    EventTarget.Webview,
+    EventTarget.WebviewWindow,
+]
