@@ -1,4 +1,5 @@
 pub mod ipc;
+pub mod path;
 pub mod webview;
 
 use std::{
@@ -325,6 +326,19 @@ impl Manager {
             }};
         }
         manager_method_impl!(slf, webview_windows_impl)
+    }
+
+    #[staticmethod]
+    fn path(py: Python<'_>, slf: ImplManager) -> PyResult<path::PathResolver> {
+        macro_rules! path_impl {
+            ($wrapper:expr) => {{
+                let py_ref = $wrapper.borrow(py);
+                let guard = py_ref.0.inner_ref_semver()??;
+                let path_resolver = guard.path().clone();
+                Ok(path::PathResolver::new(path_resolver))
+            }};
+        }
+        manager_method_impl!(slf, path_impl)
     }
 }
 

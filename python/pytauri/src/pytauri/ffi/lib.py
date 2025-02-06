@@ -47,7 +47,7 @@ _EventHandlerType = Callable[["Event"], None]
 
 
 if TYPE_CHECKING:
-    from pytauri.ffi import webview
+    from pytauri.ffi import path, webview
 
     @final
     class App:
@@ -224,6 +224,11 @@ if TYPE_CHECKING:
         @staticmethod
         def webview_windows(slf: "ImplManager", /) -> dict[str, webview.WebviewWindow]:
             """Fetch all managed webview windows."""
+            ...
+
+        @staticmethod
+        def path(slf: "ImplManager", /) -> path.PathResolver:
+            """The path resolver is a helper class for general and application-specific path APIs."""
             ...
 
     class Event:
