@@ -1,0 +1,21 @@
+# copy from: <https://github.com/PyO3/maturin/blob/v1.8.2/.github/workflows/clear-cache.yml>
+
+name: Clear Actions Cache
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  clear-cache:
+    name: Clean Cache
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Clear cache
+        run: |
+          gh cache delete --all --repo "$GITHUB_REPOSITORY"
+          echo "cache cleared"

@@ -46,6 +46,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - use `python3.10` `match` statement instead of `if-else` statement
     - bump `requires-python = ">=3.10"`
 
+### Internal
+
+- [#81](https://github.com/WSH032/pytauri/pull/81) - ci: add `clear-cache.yml` workflow.
+
 ## [0.2.0]
 
 ### BREAKING
